@@ -85,7 +85,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import io.wenyou.textquest.BuildConfig
 import io.wenyou.textquest.WenYouApp
 import io.wenyou.textquest.data.model.ContentClass
 import io.wenyou.textquest.data.model.NodeKind
@@ -164,10 +163,8 @@ fun StoryListScreen(container: WenYouApp.AppContainer, nav: NavHostController) {
                     )
                 }
                 item {
-                    val contentOptions = if (BuildConfig.LGBT_CONTENT) StoryContentFilter.entries
-                    else StoryContentFilter.entries.filter { it != StoryContentFilter.LGBT }
                     FilterChipRow(
-                        options = contentOptions,
+                        options = StoryContentFilter.entries,
                         selected = filters.contentFilter,
                         label = { it.label },
                         onSelect = { vm.setContentFilter(it) }
@@ -702,14 +699,10 @@ private fun StoryCard(story: Story, onEdit: () -> Unit, onPlay: () -> Unit, onSa
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Pill(modeText)
-                // 内容标签：LGBT 与 18+ 可同时存在；都没有则标「全年龄」
-                if (BuildConfig.LGBT_CONTENT && story.lgbt) {
-                    Pill(ContentClass.LGBT.label, container = MaterialTheme.colorScheme.tertiaryContainer)
-                }
                 if (story.adult) {
                     Pill(ContentClass.ADULT.label, container = MaterialTheme.colorScheme.tertiaryContainer)
                 }
-                if (!story.lgbt && !story.adult) {
+                if (!story.adult) {
                     Pill(ContentClass.ALL_AGE.label, container = MaterialTheme.colorScheme.secondaryContainer)
                 }
                 Pill("${story.nodes.size} 节点")

@@ -34,10 +34,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import io.wenyou.textquest.BuildConfig
 import io.wenyou.textquest.WenYouApp
 import io.wenyou.textquest.data.model.CharacterMetrics
-import io.wenyou.textquest.data.model.SexualOrientation
 import io.wenyou.textquest.ui.common.AppDropdown
 import io.wenyou.textquest.ui.common.AppField
 import io.wenyou.textquest.ui.common.ColorDots
@@ -173,15 +171,6 @@ fun CharacterEditScreen(container: WenYouApp.AppContainer, nav: NavHostControlle
                         )
                     }
                     Spacer(Modifier.padding(top = 8.dp))
-                    if (BuildConfig.LGBT_CONTENT) {
-                        AppDropdown(
-                            label = "性取向",
-                            options = SexualOrientation.entries.map { it.label to it },
-                            selected = char.orientation,
-                            onSelect = { vm.setOrientation(it) },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
                     Spacer(Modifier.padding(top = 12.dp))
                     Text("内容分类", style = MaterialTheme.typography.labelLarge)
                     SwitchRow(
@@ -190,14 +179,6 @@ fun CharacterEditScreen(container: WenYouApp.AppContainer, nav: NavHostControlle
                         checked = char.adult,
                         onCheckedChange = { vm.setAdult(it) }
                     )
-                    if (BuildConfig.LGBT_CONTENT) {
-                        SwitchRow(
-                            title = "LGBT 向内容",
-                            subtitle = "标记后归入「LGBT」分类，并受「内容开关」约束",
-                            checked = char.lgbt,
-                            onCheckedChange = { vm.setLgbt(it) }
-                        )
-                    }
                 }
             }
             item { SectionHeader("初始状态（开局沿用）") }

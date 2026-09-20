@@ -78,20 +78,6 @@ fun SettingsScreen(container: WenYouApp.AppContainer, nav: NavHostController) {
         }
     }
 
-    // 连点版本号解锁内容开关（α 版默认隐藏 LGBT/18+ 开关）
-    var lastTapAt by remember { mutableStateOf(0L) }
-    var tapCount by remember { mutableStateOf(0) }
-    val onVersionTap = {
-        val now = System.currentTimeMillis()
-        if (now - lastTapAt > 2000L) tapCount = 0
-        lastTapAt = now
-        tapCount++
-        if (tapCount >= 10) {
-            tapCount = 0
-            vm.unlockContentPrefs()
-        }
-    }
-
     val importLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
@@ -204,36 +190,17 @@ fun SettingsScreen(container: WenYouApp.AppContainer, nav: NavHostController) {
                 }
             }
 
-            if (BuildConfig.LGBT_CONTENT && ui.contentUnlocked) {
-                item { SectionHeader("内容偏好") }
-                item {
-                    TonalCard {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Column(Modifier.weight(1f)) {
-                                Text("显示 LGBT（LGBTQ+）内容", style = MaterialTheme.typography.labelLarge)
-                                Text("关闭后，剧情库与角色将隐藏 LGBT 预设，仅显示非 LGBT 内容（校园/家庭/职场/悬疑/古风/科幻等）。",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                            Switch(checked = ui.showLgbt, onCheckedChange = { vm.setShowLgbt(it) })
+            item { SectionHeader("成人内容") }
+            item {
+                TonalCard {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text("显示成人（18+）内容", style = MaterialTheme.typography.labelLarge)
+                            Text("开启后显示成人向预设，并允许 AI 描写成年、自愿的亲密/性爱场景；关闭后隐藏并保持非露骨。",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                    }
-                }
-            }
-
-            if (!BuildConfig.LGBT_CONTENT || ui.contentUnlocked) {
-                item { SectionHeader("成人内容") }
-                item {
-                    TonalCard {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Column(Modifier.weight(1f)) {
-                                Text("显示成人（18+）内容", style = MaterialTheme.typography.labelLarge)
-                                Text("开启后显示成人向预设，并允许 AI 描写成年、自愿的亲密/性爱场景；关闭后隐藏并保持非露骨。",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                            Switch(checked = ui.adultContent, onCheckedChange = { vm.setAdultContent(it) })
-                        }
+                        Switch(checked = ui.adultContent, onCheckedChange = { vm.setAdultContent(it) })
                     }
                 }
             }
@@ -299,7 +266,6 @@ fun SettingsScreen(container: WenYouApp.AppContainer, nav: NavHostController) {
                     Text("版本", style = MaterialTheme.typography.labelLarge)
                     Spacer(Modifier.height(6.dp))
                     Text("v${BuildConfig.VERSION_NAME}（build ${BuildConfig.VERSION_CODE}）\n本地优先：API Key 仅保存在本机，不上传任何远端。\n版本号由 ./gradlew bumpVersion 递增，打包前请先执行。",
-                        modifier = Modifier.clickable(onClick = onVersionTap),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }

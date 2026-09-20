@@ -41,7 +41,6 @@ android {
             dimension = "content"
             applicationIdSuffix = ".beta"
             versionNameSuffix = "-β"
-            buildConfigField("boolean", "LGBT_CONTENT", "false")
         }
     }
 

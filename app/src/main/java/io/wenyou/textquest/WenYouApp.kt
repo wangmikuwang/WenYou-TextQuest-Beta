@@ -7,7 +7,6 @@ import io.wenyou.textquest.data.llm.ChatClient
 import io.wenyou.textquest.data.model.AppBundle
 import io.wenyou.textquest.data.model.AppJson
 import io.wenyou.textquest.data.model.CharacterData
-import io.wenyou.textquest.data.model.SexualOrientation
 import io.wenyou.textquest.data.repo.LocalLibrary
 import io.wenyou.textquest.data.repo.SettingsStore
 import kotlinx.coroutines.CoroutineScope
@@ -49,14 +48,13 @@ class WenYouApp : Application() {
     }
 
     /**
-     * 一次性为「已存在且未配置」的内置角色补齐 [CharacterData.initial] 与 [CharacterData.orientation]。
-     * 非破坏性：只填充初始状态为空、性取向未标注的角色，不覆盖用户自定，
+     * 一次性为「已存在且未配置」的内置角色补齐 [CharacterData.initial]。
+     * 非破坏性：只填充初始状态为空的角色，不覆盖用户自定，
      * 也不会把用户删除的内置内容重新写回（仅针对当前仍存在的 id）。
      */
     private suspend fun enrichBuiltinInitials() {
         val doneInitial = container.settings.presetEnrichDone
-        val doneOrient = container.settings.presetOrientDone
-        if (doneInitial && doneOrient) return
+        if (doneInitial) return
         try {
             val names = listOf(
                 "presets/wenyou-bare-presets.json",
@@ -65,7 +63,6 @@ class WenYouApp : Application() {
             )
             val existing = container.library.characters.value.associateBy { it.id }
             var changedInitial = false
-            var changedOrient = false
             val updates = mutableListOf<CharacterData>()
             for (name in names) {
                 val text = assets.open(name).bufferedReader(Charsets.UTF_8).use { it.readText() }
@@ -77,16 +74,11 @@ class WenYouApp : Application() {
                         next = next.copy(initial = c.initial)
                         changedInitial = true
                     }
-                    if (!doneOrient && cur.orientation == SexualOrientation.UNKNOWN && c.orientation != SexualOrientation.UNKNOWN) {
-                        next = next.copy(orientation = c.orientation)
-                        changedOrient = true
-                    }
                     if (next !== cur) updates += next
                 }
             }
             for (cc in updates) container.library.upsertCharacter(cc)
             if (changedInitial) container.settings.presetEnrichDone = true
-            if (changedOrient) container.settings.presetOrientDone = true
         } catch (_: Throwable) {
             // 补齐失败不阻塞主流程，下次启动重试
         }
@@ -118,19 +110,15 @@ class WenYouApp : Application() {
         }
     }
 
-    /**
-     * 把 assets/presets/ 下的题材预设包（BL/伪百合/男娘/第四爱/娱乐圈ABO 等）
-     * 自动并入资料库：按 id 去重、只补不覆盖。升级安装也能补到新版本新增的预设。
-     */
-    /** 逐个资源去重合并（按 id 只补不覆盖）。markLgbt/markAdult 用于打标签。 */
-    private suspend fun applyPresetAssets(presetFiles: List<String>, markLgbt: Boolean = false, markAdult: Boolean = false) {
+    /** 逐个资源去重合并（按 id 只补不覆盖）。 */
+    private suspend fun applyPresetAssets(presetFiles: List<String>, markAdult: Boolean = false) {
         // 每个资源文件只成功合并一次并记录状态；否则每次启动都会全量重扫，
         // 既重复解析，也会把用户已删除的内置内容重新写回
         val already = container.settings.appliedPresetFiles()
         for (name in presetFiles) {
             if (name in already) continue
             try {
-                applyPresetAsset(name, markLgbt, markAdult)
+                applyPresetAsset(name, markAdult)
                 container.settings.markPresetFileApplied(name)
             } catch (_: Throwable) {
                 // 单个资源失败不影响其它资源与主流程，下次启动重试
@@ -138,7 +126,7 @@ class WenYouApp : Application() {
         }
     }
 
-    private suspend fun applyPresetAsset(name: String, markLgbt: Boolean, markAdult: Boolean) {
+    private suspend fun applyPresetAsset(name: String, markAdult: Boolean) {
         val text = assets.open(name)
             .bufferedReader(Charsets.UTF_8)
             .use { it.readText() }
@@ -146,14 +134,14 @@ class WenYouApp : Application() {
         val charIds = container.library.characters.value.mapTo(mutableSetOf()) { it.id }
         for (c in bundle.characters) {
             if (charIds.add(c.id)) {
-                val cc = if (markLgbt || markAdult) c.copy(lgbt = c.lgbt || markLgbt, adult = c.adult || markAdult) else c
+                val cc = if (markAdult) c.copy(adult = true) else c
                 container.library.upsertCharacter(cc)
             }
         }
         val storyIds = container.library.stories.value.mapTo(mutableSetOf()) { it.id }
         for (s in bundle.stories) {
             if (storyIds.add(s.id)) {
-                val ss = if (markLgbt || markAdult) s.copy(lgbt = s.lgbt || markLgbt, adult = s.adult || markAdult) else s
+                val ss = if (markAdult) s.copy(adult = true) else s
                 container.library.upsertStory(ss)
             }
         }
@@ -168,7 +156,7 @@ class WenYouApp : Application() {
      * 一次性修正历史数据：早期构建把「常备预设」（bare/bare2）也打上了成人标，
      * 导致全部剧情/角色被误标 18+，关闭「成人内容」后剧情库会整个消失。
      *
-     * 仅针对仍属于这两个预设、且当前为 `adult=true 且 lgbt=false` 的条目清除成人标；
+     * 仅针对仍属于这两个预设、且当前为 `adult=true` 的条目清除成人标；
      * 只运行一次，不影响用户自行打标的其它内容。
      */
     private suspend fun repairContentFlags() {
@@ -184,12 +172,12 @@ class WenYouApp : Application() {
                 bundle.characters.forEach { presetCharIds += it.id }
             }
             for (s in container.library.stories.value) {
-                if (s.id in presetStoryIds && s.adult && !s.lgbt) {
+                if (s.id in presetStoryIds && s.adult) {
                     container.library.upsertStory(s.copy(adult = false))
                 }
             }
             for (c in container.library.characters.value) {
-                if (c.id in presetCharIds && c.adult && !c.lgbt) {
+                if (c.id in presetCharIds && c.adult) {
                     container.library.upsertCharacter(c.copy(adult = false))
                 }
             }

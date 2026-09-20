@@ -53,10 +53,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import io.wenyou.textquest.BuildConfig
 import io.wenyou.textquest.WenYouApp
 import io.wenyou.textquest.data.model.CharacterData
-import io.wenyou.textquest.data.model.SexualOrientation
 import io.wenyou.textquest.ui.HubScaffold
 import io.wenyou.textquest.ui.R
 import io.wenyou.textquest.ui.common.EmojiBadge
@@ -76,7 +74,6 @@ fun CharactersScreen(container: WenYouApp.AppContainer, nav: NavHostController) 
     val vm: LibraryViewModel = viewModel(factory = Vms.factory { LibraryViewModel(it) })
     val characters by vm.characters.collectAsState()
     val totalCharacters by vm.totalCharacters.collectAsState()
-    val filters by vm.filters.collectAsState()
     var pendingDelete by remember { mutableStateOf<CharacterData?>(null) }
     var sharePicker by remember { mutableStateOf<CharacterData?>(null) }
     var shareCodeChar by remember { mutableStateOf<CharacterData?>(null) }
@@ -117,21 +114,11 @@ fun CharactersScreen(container: WenYouApp.AppContainer, nav: NavHostController) 
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                item {
-                    if (BuildConfig.LGBT_CONTENT) {
-                        OrientationFilterRow(
-                            selected = filters.orientationFilter,
-                            onSelect = { vm.setOrientationFilter(it) }
-                        )
-                    }
-                }
                 if (characters.isEmpty()) {
                     item {
                         CharacterEmptyState(
-                            title = if (totalCharacters > 0) "该分类下暂无角色" else "还没有角色",
-                            body = if (totalCharacters > 0) "试试切换上方性取向，或清除筛选查看全部。" else "性格、说话方式与背景会注入 AI；分支剧本也可直接引用角色来展示台词。",
-                            showReset = totalCharacters > 0,
-                            onReset = { vm.setOrientationFilter(null) }
+                            title = "还没有角色",
+                            body = "性格、说话方式与背景会注入 AI；分支剧本也可直接引用角色来展示台词。"
                         )
                     }
                 } else {
@@ -218,30 +205,9 @@ fun CharactersScreen(container: WenYouApp.AppContainer, nav: NavHostController) 
     }
 }
 
-/** 性取向过滤 Chip 行（全部 + 各取向）。 */
+/** 角色库为空时的占位。 */
 @Composable
-private fun OrientationFilterRow(
-    selected: SexualOrientation?,
-    onSelect: (SexualOrientation?) -> Unit
-) {
-    val options: List<SexualOrientation?> = listOf(null) + SexualOrientation.entries
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())
-    ) {
-        options.forEach { opt ->
-            FilterChip(
-                selected = opt == selected,
-                onClick = { onSelect(opt) },
-                label = { Text(opt?.label ?: "全部") }
-            )
-        }
-    }
-}
-
-/** 全库为空 / 性取向筛选后无内容 的占位与「清除筛选」入口。 */
-@Composable
-private fun CharacterEmptyState(title: String, body: String, showReset: Boolean, onReset: () -> Unit) {
+private fun CharacterEmptyState(title: String, body: String) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(vertical = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -253,9 +219,6 @@ private fun CharacterEmptyState(title: String, body: String, showReset: Boolean,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center)
         Spacer(Modifier.height(6.dp))
-        if (showReset) {
-            TextButton(onClick = onReset) { Text("清除筛选 / 查看全部") }
-        }
     }
 }
 
@@ -297,10 +260,6 @@ private fun CharacterCard(c: CharacterData, onEdit: () -> Unit, onShare: () -> U
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                if (BuildConfig.LGBT_CONTENT) {
-                    Pill(c.orientation.label, container = MaterialTheme.colorScheme.secondaryContainer)
-                    if (c.lgbt) Pill("LGBT", container = MaterialTheme.colorScheme.tertiaryContainer)
-                }
                 if (c.adult) Pill("18+", container = MaterialTheme.colorScheme.tertiaryContainer)
             }
         }

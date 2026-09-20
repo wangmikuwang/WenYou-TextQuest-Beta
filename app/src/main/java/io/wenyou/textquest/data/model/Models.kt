@@ -74,23 +74,10 @@ data class ApiProfile(
 // 角色
 // ---------------------------------------------------------------------------
 
-/** 角色性取向（用于角色库分类与「性取向」检索；内置角色已按题材预设，可在编辑器修改）。 */
-@Serializable
-enum class SexualOrientation(val label: String) {
-    @SerialName("straight") STRAIGHT("异性恋"),
-    @SerialName("gay") GAY("男同性恋"),
-    @SerialName("lesbian") LESBIAN("女同性恋"),
-    @SerialName("bi") BI("双性恋"),
-    @SerialName("pan") PAN("泛性恋"),
-    @SerialName("asexual") ASEXUAL("无性恋"),
-    @SerialName("unknown") UNKNOWN("未标注")
-}
-
-/** 剧情内容分类（全年龄 / LGBT / 成人18+）。 */
+/** 剧情内容分类。 */
 @Serializable
 enum class ContentClass(val label: String) {
     @SerialName("all_age") ALL_AGE("全年龄"),
-    @SerialName("lgbt") LGBT("LGBT"),
     @SerialName("adult") ADULT("18+")
 }
 
@@ -129,10 +116,6 @@ data class CharacterData(
     val bottomRuleIds: List<String> = emptyList(),
     /** 初始状态（开局新会话沿用；可在角色编辑器调整，对局中由 AI 导演实时更新）。 */
     val initial: CharacterState = CharacterState(),
-    /** 性取向（角色库分类用）。 */
-    val orientation: SexualOrientation = SexualOrientation.UNKNOWN,
-    /** 是否为 LGBT 向内容（供「内容开关」过滤显示）。 */
-    val lgbt: Boolean = false,
     /** 是否为成人向内容。 */
     val adult: Boolean = false
 )
@@ -253,8 +236,6 @@ data class Story(
     val initialVariables: Map<String, Double> = emptyMap(),
     val initialFlags: Set<String> = emptySet(),
     val ai: AiStorySettings = AiStorySettings(),
-    /** 是否为 LGBT 向内容（供「内容开关」过滤显示）。 */
-    val lgbt: Boolean = false,
     /** 是否为成人向内容。 */
     val adult: Boolean = false
 )

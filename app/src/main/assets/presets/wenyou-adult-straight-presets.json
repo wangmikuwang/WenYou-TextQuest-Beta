@@ -11,12 +11,22 @@
       "emoji": "🍷",
       "exampleDialogue": "「把灯调暗一点。剩下的，你来。”",
       "personality": "知性从容、掌控感强，私底下也温柔；看重分寸，讨厌被冒犯。",
-      "orientation": "straight",
       "adult": true,
-      "lgbt": false,
       "initial": {
-        "metrics": { "affection": 50, "trust": 45, "mood": 58, "energy": 72, "health": 88, "fatigue": 30, "arousal": 28 },
-        "flags": ["成年", "职场", "主编"],
+        "metrics": {
+          "affection": 50,
+          "trust": 45,
+          "mood": 58,
+          "energy": 72,
+          "health": 88,
+          "fatigue": 30,
+          "arousal": 28
+        },
+        "flags": [
+          "成年",
+          "职场",
+          "主编"
+        ],
         "description": "刚合上终稿，靠在椅背上闭目养神。"
       }
     },
@@ -31,12 +41,22 @@
       "emoji": "📷",
       "exampleDialogue": "「我不是在拍风景。……我是在拍你。」",
       "personality": "克制、专注、自尊心强；对洛蔓又敬又动心，越在意越笨拙。",
-      "orientation": "straight",
       "adult": true,
-      "lgbt": false,
       "initial": {
-        "metrics": { "affection": 55, "trust": 45, "mood": 52, "energy": 70, "health": 90, "fatigue": 32, "arousal": 30 },
-        "flags": ["成年", "职场", "摄影师"],
+        "metrics": {
+          "affection": 55,
+          "trust": 45,
+          "mood": 52,
+          "energy": 70,
+          "health": 90,
+          "fatigue": 32,
+          "arousal": 30
+        },
+        "flags": [
+          "成年",
+          "职场",
+          "摄影师"
+        ],
         "description": "把相机挂在肩上，目光却总落在她那边。"
       }
     },
@@ -51,12 +71,22 @@
       "emoji": "🖥️",
       "exampleDialogue": "「你打游戏的时候,眼睛会发光。我在旁边看着。……不是看游戏。」",
       "personality": "沉稳、执拗、不擅表达，习惯用行动证明；对沈叙在意得不行。",
-      "orientation": "straight",
       "adult": true,
-      "lgbt": false,
       "initial": {
-        "metrics": { "affection": 52, "trust": 46, "mood": 60, "energy": 70, "health": 86, "fatigue": 34, "arousal": 26 },
-        "flags": ["成年", "都市", "开发者"],
+        "metrics": {
+          "affection": 52,
+          "trust": 46,
+          "mood": 60,
+          "energy": 70,
+          "health": 86,
+          "fatigue": 34,
+          "arousal": 26
+        },
+        "flags": [
+          "成年",
+          "都市",
+          "开发者"
+        ],
         "description": "屏幕亮着，指尖敲着，余光却瞟向旁边的人。"
       }
     },
@@ -71,12 +101,22 @@
       "emoji": "🌧️",
       "exampleDialogue": "「你再这样盯着我，我就真以为你喜欢我了。」",
       "personality": "嘴硬心软、胜负欲强，其实很在意身边的人；越喜欢越爱逞强。",
-      "orientation": "straight",
       "adult": true,
-      "lgbt": false,
       "initial": {
-        "metrics": { "affection": 54, "trust": 48, "mood": 62, "energy": 72, "health": 88, "fatigue": 30, "arousal": 24 },
-        "flags": ["成年", "都市", "产品经理"],
+        "metrics": {
+          "affection": 54,
+          "trust": 48,
+          "mood": 62,
+          "energy": 72,
+          "health": 88,
+          "fatigue": 30,
+          "arousal": 24
+        },
+        "flags": [
+          "成年",
+          "都市",
+          "产品经理"
+        ],
         "description": "抱着笔记本，嘴上嫌弃，人却坐得离他很近。"
       }
     }
@@ -111,10 +151,12 @@
       "colorIndex": 3,
       "initialVariables": {},
       "subtitle": "成年人之间的某种暧昧",
-      "characterIds": ["c-luoman", "c-shengjian"],
+      "characterIds": [
+        "c-luoman",
+        "c-shengjian"
+      ],
       "genre": "都市 · 职场 · 成人",
-      "adult": true,
-      "lgbt": false
+      "adult": true
     },
     {
       "mode": "ai_dm",
@@ -144,10 +186,12 @@
       "colorIndex": 6,
       "initialVariables": {},
       "subtitle": "从发小，到一夜之间",
-      "characterIds": ["c-muran", "c-shenxu"],
+      "characterIds": [
+        "c-muran",
+        "c-shenxu"
+      ],
       "genre": "都市 · 成人",
-      "adult": true,
-      "lgbt": false
+      "adult": true
     },
     {
       "mode": "ai_dm",
@@ -177,10 +221,12 @@
       "colorIndex": 1,
       "initialVariables": {},
       "subtitle": "成年人之间，不再试探",
-      "characterIds": ["c-luoman", "c-shengjian"],
+      "characterIds": [
+        "c-luoman",
+        "c-shengjian"
+      ],
       "genre": "都市 · 成人",
-      "adult": true,
-      "lgbt": false
+      "adult": true
     }
   ],
   "exportedAt": 1788952057259,
