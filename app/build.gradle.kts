@@ -28,6 +28,7 @@ android {
         targetSdk = 34
         versionCode = appVersionCode
         versionName = appVersionName
+        buildConfigField("String", "APP_FILE_PREFIX", "\"XingXu\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -73,8 +74,7 @@ android {
 
     // APK 产物去掉 debug 字样，直接可用于分发。
     applicationVariants.all {
-        val flavor = name.removeSuffix("Debug").removeSuffix("Release")
-        val baseName = "WenYou-$flavor-v$appVersionName"
+        val baseName = "XingXu-v$appVersionName"
         outputs.all {
             (this as? com.android.build.gradle.internal.api.BaseVariantOutputImpl)
                 ?.outputFileName = "$baseName.apk"
