@@ -14,7 +14,7 @@
 
 ## 剧情分支树（3.9.0）
 
-验证：22 项单元测试、Android Lint、独立 APK 构建与 Pixel 7 / Android 14 折叠、展开、节点选择设备测试通过。Alpha 检查内置分支剧情的实际连线及跳转编辑；Beta 检查 AI 导演动态分支。
+验证：22 项单元测试、Android Lint、独立 APK 构建与 Pixel 7 / Android 14 折叠、展开、节点选择设备测试通过。已检查 AI 导演动态分支。
 
 剧情库 → 编辑剧情 → 顶部「分支图」。按起点展开作者配置的选项、条件出口、自动跳转及 AI 回到主线连接；分支可折叠或全部展开，点击节点返回对应编辑区域，使用当前未保存的编辑内容实时生成图。
 
@@ -22,13 +22,13 @@
 
 ## 生成实时通知（3.8.0）
 
-验证：21 项单元测试、Android Lint、独立 APK 构建及 Pixel 7 / Android 14 通知生命周期设备测试通过。两版使用已有 DeepSeek 配置实际生成成功，普通完成通知可见；Beta 验证拒绝权限保持关闭、重新授权开启。实际小米超级岛及 Android 16 系统提升效果尚未实机验证。
+验证：21 项单元测试、Android Lint、独立 APK 构建及 Pixel 7 / Android 14 通知生命周期设备测试通过。使用已有 DeepSeek 配置实际生成成功，普通完成通知可见；已验证拒绝权限保持关闭、重新授权开启。实际小米超级岛及 Android 16 系统提升效果尚未实机验证。
 
 设置 → 生成实时通知，可开启用户主动发起的 AI 请求进度提示。原生通知显示当前阶段、真实耗时和并行请求数，点击回到应用；通知不含剧情、思考正文、服务密钥或提示词。生成期间启用短时 dataSync 前台服务；请求结束、取消、关闭开关或禁用通知通道后退出，不自动重启任务。完成/失败使用普通通知，15 秒后清除；取消不留下完成提示。进程被强制停止后任务不会恢复。
 
 Android 16 使用原生 ProgressStyle 未知进度样式；Android 16 QPR2 通过官方 extras 请求实时更新，是否提升由系统及用户设置决定。旧设备显示普通持续进度通知，不推测完成百分比。
 
-小米 OS2/OS3 按 `notification_focus_protocol` 添加 `miui.focus.param` 及图标 Bundle，使用官方文本模板，未授权时保留普通通知。Alpha 与 Beta 需要分别申请包名、签名及 `ai_generation` 场景权限；该场景标识是待审核配置，平台若核准其他标识需同步替换。当前只完成代码适配，不代表已获超级岛资格。参考 [小米开发指南](https://dev.mi.com/xiaomihyperos/documentation/detail?pId=2131)、[接入流程](https://dev.mi.com/xiaomihyperos/documentation/detail?pId=2132)、[Android 实时更新](https://developer.android.com/develop/ui/views/notifications/live-update)。
+小米 OS2/OS3 按 `notification_focus_protocol` 添加 `miui.focus.param` 及图标 Bundle，使用官方文本模板，未授权时保留普通通知。本应用需要申请包名、签名及 `ai_generation` 场景权限；该场景标识是待审核配置，平台若核准其他标识需同步替换。当前只完成代码适配，不代表已获超级岛资格。参考 [小米开发指南](https://dev.mi.com/xiaomihyperos/documentation/detail?pId=2131)、[接入流程](https://dev.mi.com/xiaomihyperos/documentation/detail?pId=2132)、[Android 实时更新](https://developer.android.com/develop/ui/views/notifications/live-update)。
 
 ## 玩法模式
 
@@ -164,7 +164,7 @@ sequenceDiagram
 | `saves.json` | 存档（含日志与角色状态快照） | 对局内 / 主页 |
 | `bottom_rules.json` | 底层基调（不可动摇规则）实体 | 设置 → 底层基调 |
 
-内置题材预设以 `assets/presets/*.json` 提供，启动时检查合并状态：尚未合并过的包按 id 并入资料库，规则为只补不覆盖；已合并的文件记录在 `SettingsStore` 的 `preset_files_applied_v2` 中，避免重复导入。β 的预设与 α 同源，只裁掉 `orientation` / `lgbt` 字段，改动时两个项目需要同步。
+内置题材预设以 `assets/presets/*.json` 提供，启动时检查合并状态：尚未合并过的包按 id 并入资料库，规则为只补不覆盖；已合并的文件记录在 `SettingsStore` 的 `preset_files_applied_v2` 中，避免重复导入。打包以 `app/src/beta/assets/presets/` 下的文件为准，保留本应用的预设内容与分级设置。
 
 ## 构建
 
@@ -223,9 +223,9 @@ app/src/main/java/io/wenyou/textquest/
 - 底层基调支持独立实体与角色内嵌单条两种来源，均注入人设最底；角色删除某条引用或删除规则时自动摘除关联，避免悬空 id。
 - 用户已删除的内置内容不会在后续启动时被自动写回。
 
-## 共享功能同步（2026-10-02）
+## 对话与创作功能（2026-10-02）
 
-已同步 Alpha 的三栏对话（可折叠 AI 思考、旁白、角色对话）、可切换液态玻璃主题、布局修正，以及 AI 一句话创建剧情和人物。生成后可预览、保存并编辑；密钥仅保存在本机。Alpha 与 Beta 分别维护、验证和发布，保留各自内容设置与预设。
+支持三栏对话（可折叠 AI 思考、旁白、角色对话）、可切换液态玻璃主题、布局修正，以及 AI 一句话创建剧情和人物。生成后可预览、保存并编辑；密钥仅保存在本机。
 
 ## 剧情记忆与人物关系
 
