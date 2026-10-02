@@ -3,6 +3,7 @@ package io.wenyou.textquest.data.repo
 import android.content.Context
 import android.content.SharedPreferences
 import io.wenyou.textquest.ui.theme.ThemeMode
+import io.wenyou.textquest.ui.theme.ThemeStyle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,7 +13,8 @@ data class UiPrefs(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val dynamicColor: Boolean = true,
     val defaultProviderId: String? = null,
-    val adultContent: Boolean = true
+    val adultContent: Boolean = true,
+    val themeStyle: ThemeStyle = ThemeStyle.MATERIAL
 )
 
 /** 轻量应用设置（SharedPreferences），变更同步发布到 [state] 供主题实时响应。 */
@@ -25,6 +27,7 @@ class SettingsStore(context: Context) {
     val state: StateFlow<UiPrefs> = _state.asStateFlow()
 
     private fun load(): UiPrefs = UiPrefs(
+        themeStyle = ThemeStyle.fromStored(prefs.getString(KEY_STYLE, null)),
         themeMode = themeOf(prefs.getString(KEY_THEME, ThemeMode.SYSTEM.name)),
         dynamicColor = prefs.getBoolean(KEY_DYNAMIC, true),
         defaultProviderId = prefs.getString(KEY_PROVIDER, null),
@@ -36,6 +39,11 @@ class SettingsStore(context: Context) {
         ThemeMode.valueOf(raw ?: "")
     } catch (_: Throwable) {
         ThemeMode.SYSTEM
+    }
+
+    fun setThemeStyle(style: ThemeStyle) {
+        prefs.edit().putString(KEY_STYLE, style.name).apply()
+        _state.value = _state.value.copy(themeStyle = style)
     }
 
     fun setThemeMode(mode: ThemeMode) {
@@ -91,6 +99,7 @@ class SettingsStore(context: Context) {
         set(value) = prefs.edit().putBoolean(KEY_COMPACT, value).apply()
 
     private companion object {
+        const val KEY_STYLE = "theme_style"
         const val KEY_THEME = "theme_mode"
         const val KEY_DYNAMIC = "dynamic_color"
         const val KEY_PROVIDER = "default_provider"
