@@ -236,3 +236,12 @@ app/src/main/java/io/wenyou/textquest/
 生成过程中显示等待、思考或生成阶段、实际耗时与接收字符数，不显示虚假的完成百分比。AI 服务页、对局和一句话创建可查看本机最近 100 次请求，记录实际服务返回的输入/输出及缓存 tokens、耗时和完成/失败/取消状态，并在本机保存。未知用量和取消/失败请求的费用不按零计。编辑服务时可填写当前模型每百万 tokens 的输入、输出、缓存读取和写入单价及 CNY/USD 等币种；费用为按请求时配置的估算，缺少必需单价时显示未知，不同币种分别汇总。换模型时请核对价格，账单以服务商为准。
 
 协议参考：[DeepSeek 流式用量](https://api-docs.deepseek.com/api/create-chat-completion/)、[Anthropic 流式用量](https://platform.claude.com/docs/en/build-with-claude/streaming)、[Gemini usageMetadata](https://ai.google.dev/api/generate-content#UsageMetadata)。
+
+## 液态玻璃优化（3.9.1）
+
+选择液态玻璃时隐藏整个动态取色设置，切回 Material You 后恢复显示并保留原有偏好。设置页首次显示直接使用保存的主题，避免默认风格闪现和布局跳动。
+
+玻璃的模糊、折射滤镜与高光画笔按尺寸缓存；边缘折射直接计算圆角矩形法线，减少重复距离计算。文字、图标、边框及玻璃背景保持原始分辨率，背景继续实时更新。
+
+验证：22 项单元测试、Android Lint、独立构建及 Pixel 7 / Android 14 的玻璃实时更新、主题切换设备测试。滚动和页面切换各测量两轮，模拟器仍有明显掉帧，尚未测得稳定的帧耗时改善，需继续在真机排查。
+
