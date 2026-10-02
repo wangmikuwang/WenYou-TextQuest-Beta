@@ -237,6 +237,10 @@ app/src/main/java/io/wenyou/textquest/
 
 协议参考：[DeepSeek 流式用量](https://api-docs.deepseek.com/api/create-chat-completion/)、[Anthropic 流式用量](https://platform.claude.com/docs/en/build-with-claude/streaming)、[Gemini usageMetadata](https://ai.google.dev/api/generate-content#UsageMetadata)。
 
+## 玻璃通透度调整（3.9.2）
+
+减少深浅色表面遮罩和白色高光，模糊半径从 12dp 调整为 6dp，使背后内容更清晰地透出；保留实时采样、边缘折射和独立绘制的文字图标。Android 8–11 仍使用原有可读着色回退。设备检查覆盖浅色/深色背景透出、模糊、背景实时更新及动态取色开关隐藏与恢复。
+
 ## 液态玻璃优化（3.9.1）
 
 选择液态玻璃时隐藏整个动态取色设置，切回 Material You 后恢复显示并保留原有偏好。设置页首次显示直接使用保存的主题，避免默认风格闪现和布局跳动。
