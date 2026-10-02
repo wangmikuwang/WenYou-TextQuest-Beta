@@ -66,7 +66,7 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SettingsScreen(container: WenYouApp.AppContainer, nav: NavHostController) {
-    val vm: SettingsViewModel = viewModel(factory = Vms.factory { SettingsViewModel(it) })
+    val vm: SettingsViewModel = viewModel(factory = Vms.factory { SettingsViewModel(container) })
     val ui by vm.ui.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
