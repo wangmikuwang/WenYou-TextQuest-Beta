@@ -172,9 +172,9 @@ fun HubBottomBar(nav: NavHostController) {
         items.forEach { item ->
             NavigationBarItem(
                 colors = if (apple) NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.primary,
-                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                    indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)
+                    selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
                 ) else NavigationBarItemDefaults.colors(),
                 selected = current == item.route,
                 onClick = {
