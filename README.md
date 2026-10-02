@@ -12,6 +12,16 @@
 - 分享与导入：剧情与角色可生成分享码（WY2 deflate 压缩文本）或二维码（单张优先，过大自动拆成多片 QR Book 轮播）；支持粘贴分享码、相机扫码、相册一次多选整套二维码导入，按 id 只补不覆盖并提示重复内容。
 - 对局存档：支持随时存档、主页续玩，以及整包 JSON 导出 / 导入。
 
+## 生成实时通知（3.8.0）
+
+验证：21 项单元测试、Android Lint、独立 APK 构建及 Pixel 7 / Android 14 通知生命周期设备测试通过。两版使用已有 DeepSeek 配置实际生成成功，普通完成通知可见；Beta 验证拒绝权限保持关闭、重新授权开启。实际小米超级岛及 Android 16 系统提升效果尚未实机验证。
+
+设置 → 生成实时通知，可开启用户主动发起的 AI 请求进度提示。原生通知显示当前阶段、真实耗时和并行请求数，点击回到应用；通知不含剧情、思考正文、服务密钥或提示词。生成期间启用短时 dataSync 前台服务；请求结束、取消、关闭开关或禁用通知通道后退出，不自动重启任务。完成/失败使用普通通知，15 秒后清除；取消不留下完成提示。进程被强制停止后任务不会恢复。
+
+Android 16 使用原生 ProgressStyle 未知进度样式；Android 16 QPR2 通过官方 extras 请求实时更新，是否提升由系统及用户设置决定。旧设备显示普通持续进度通知，不推测完成百分比。
+
+小米 OS2/OS3 按 `notification_focus_protocol` 添加 `miui.focus.param` 及图标 Bundle，使用官方文本模板，未授权时保留普通通知。Alpha 与 Beta 需要分别申请包名、签名及 `ai_generation` 场景权限；该场景标识是待审核配置，平台若核准其他标识需同步替换。当前只完成代码适配，不代表已获超级岛资格。参考 [小米开发指南](https://dev.mi.com/xiaomihyperos/documentation/detail?pId=2131)、[接入流程](https://dev.mi.com/xiaomihyperos/documentation/detail?pId=2132)、[Android 实时更新](https://developer.android.com/develop/ui/views/notifications/live-update)。
+
 ## 玩法模式
 
 | 模式 | 玩法 | 是否依赖 AI | 适用场景 |

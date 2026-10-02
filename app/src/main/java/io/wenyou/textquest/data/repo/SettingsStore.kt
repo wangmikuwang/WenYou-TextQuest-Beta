@@ -14,6 +14,7 @@ data class UiPrefs(
     val dynamicColor: Boolean = true,
     val defaultProviderId: String? = null,
     val adultContent: Boolean = true,
+    val generationNotifications: Boolean = false,
     val themeStyle: ThemeStyle = ThemeStyle.MATERIAL
 )
 
@@ -27,6 +28,7 @@ class SettingsStore(context: Context) {
     val state: StateFlow<UiPrefs> = _state.asStateFlow()
 
     private fun load(): UiPrefs = UiPrefs(
+        generationNotifications = prefs.getBoolean("generation_notifications", false),
         themeStyle = ThemeStyle.fromStored(prefs.getString(KEY_STYLE, null)),
         themeMode = themeOf(prefs.getString(KEY_THEME, ThemeMode.SYSTEM.name)),
         dynamicColor = prefs.getBoolean(KEY_DYNAMIC, true),
@@ -39,6 +41,11 @@ class SettingsStore(context: Context) {
         ThemeMode.valueOf(raw ?: "")
     } catch (_: Throwable) {
         ThemeMode.SYSTEM
+    }
+
+    fun setGenerationNotifications(on: Boolean) {
+        prefs.edit().putBoolean("generation_notifications", on).apply()
+        _state.value = _state.value.copy(generationNotifications = on)
     }
 
     fun setThemeStyle(style: ThemeStyle) {
