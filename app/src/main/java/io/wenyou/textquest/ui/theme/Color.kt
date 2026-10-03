@@ -4,25 +4,25 @@ import androidx.compose.ui.graphics.Color
 
 /**
  * Material You 动态配色关闭时的回退主题种子与基础色。
- * 主色取自中性紫（类似默认 M3 基线），打开「动态配色」后由系统壁纸取色覆盖。
+ * 星蓝、冷白与蓝灰；打开「动态配色」后由系统壁纸取色覆盖。
  */
-val BrandPrimary = Color(0xFF6750A4)
+val BrandPrimary = Color(0xFF365E87)
 val BrandOnPrimary = Color(0xFFFFFFFF)
-val BrandPrimaryContainer = Color(0xFFEADDFF)
-val BrandOnPrimaryContainer = Color(0xFF21005D)
+val BrandPrimaryContainer = Color(0xFFD8E9FC)
+val BrandOnPrimaryContainer = Color(0xFF102B45)
 
-val BrandSecondary = Color(0xFF625B71)
+val BrandSecondary = Color(0xFF566477)
 val BrandOnSecondary = Color(0xFFFFFFFF)
-val BrandSecondaryContainer = Color(0xFFE8DEF8)
-val BrandOnSecondaryContainer = Color(0xFF1D192B)
+val BrandSecondaryContainer = Color(0xFFDEE7F1)
+val BrandOnSecondaryContainer = Color(0xFF1A2635)
 
-val BrandTertiary = Color(0xFF7D5260)
-val BrandTertiaryContainer = Color(0xFFFFD8E4)
+val BrandTertiary = Color(0xFF715D35)
+val BrandTertiaryContainer = Color(0xFFF3E4B9)
 
-val BrandBackgroundLight = Color(0xFFFDF8FD)
-val BrandSurfaceLight = Color(0xFFFFFBFF)
-val BrandBackgroundDark = Color(0xFF141218)
-val BrandSurfaceDark = Color(0xFF141218)
+val BrandBackgroundLight = Color(0xFFF4F7FA)
+val BrandSurfaceLight = Color(0xFFFBFCFF)
+val BrandBackgroundDark = Color(0xFF101820)
+val BrandSurfaceDark = Color(0xFF18222D)
 
 /**
  * 头像 / 封面 / 节点标签的固定取色板（独立于主题，保证不同存档间辨识度一致）。

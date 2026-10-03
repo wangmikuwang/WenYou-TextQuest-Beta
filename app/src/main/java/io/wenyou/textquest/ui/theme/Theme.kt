@@ -10,6 +10,8 @@ import androidx.compose.material3.Shapes
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ColorScheme
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -53,10 +55,24 @@ internal fun appleColors(dark: Boolean) = if (dark) darkColorScheme(
     surfaceVariant = Color(0xFFECECF1), onSurfaceVariant = Color(0xFF56565E), outline = Color(0xFF767680)
 )
 val LocalThemeStyle = staticCompositionLocalOf { ThemeStyle.MATERIAL }
+
+internal fun ColorScheme.readableAccent(accent: Color = primary): Color {
+    val foreground = accent.luminance()
+    return if (listOf(background, surface, surfaceContainerLowest, surfaceContainerLow,
+        surfaceContainer, surfaceContainerHigh, surfaceContainerHighest).all {
+        val background = it.luminance()
+        (maxOf(foreground, background) + 0.05f) / (minOf(foreground, background) + 0.05f) >= 4.5f
+    }) accent else onSurface
+}
 private val AppleShapes = Shapes(small = RoundedCornerShape(8.dp), medium = RoundedCornerShape(12.dp), large = RoundedCornerShape(18.dp))
+private val AppShapes = Shapes(
+    extraSmall = RoundedCornerShape(4.dp), small = RoundedCornerShape(8.dp),
+    medium = RoundedCornerShape(16.dp), large = RoundedCornerShape(24.dp),
+    extraLarge = RoundedCornerShape(32.dp)
+)
 
 
-private val LightColors = lightColorScheme(
+internal val LightColors = lightColorScheme(
     primary = BrandPrimary,
     onPrimary = BrandOnPrimary,
     primaryContainer = BrandPrimaryContainer,
@@ -66,25 +82,45 @@ private val LightColors = lightColorScheme(
     secondaryContainer = BrandSecondaryContainer,
     onSecondaryContainer = BrandOnSecondaryContainer,
     tertiary = BrandTertiary,
+    onTertiary = Color.White,
     tertiaryContainer = BrandTertiaryContainer,
+    onTertiaryContainer = Color(0xFF302608),
     background = BrandBackgroundLight,
-    surface = BrandSurfaceLight
+    onBackground = Color(0xFF1B2632),
+    surface = BrandSurfaceLight,
+    onSurface = Color(0xFF1B2632),
+    surfaceContainerLowest = Color.White,
+    surfaceContainerLow = Color(0xFFEDF2F7),
+    surfaceContainer = Color(0xFFE7EDF3),
+    surfaceContainerHigh = Color(0xFFE1E7EE),
+    surfaceContainerHighest = Color(0xFFDAE1E9),
+    surfaceVariant = Color(0xFFE1E8F0), onSurfaceVariant = Color(0xFF475463),
+    outline = Color(0xFF7F8B98), outlineVariant = Color(0xFFC7D1DC),
+    inverseSurface = Color(0xFF2B3A49), inverseOnSurface = Color(0xFFEAF1F8),
+    inversePrimary = Color(0xFFA8CDF4)
 )
 
-private val DarkColors = darkColorScheme(
-    primary = Color(0xFFD0BCFF),
-    onPrimary = Color(0xFF381E72),
-    primaryContainer = Color(0xFF4F378B),
-    onPrimaryContainer = Color(0xFFEADDFF),
-    secondary = Color(0xFFCCC2DC),
-    onSecondary = Color(0xFF332D41),
-    secondaryContainer = Color(0xFF4A4458),
-    onSecondaryContainer = Color(0xFFE8DEF8),
-    tertiary = Color(0xFFEFB8C8),
-    tertiaryContainer = Color(0xFF633B48),
+internal val DarkColors = darkColorScheme(
+    primary = Color(0xFFA8CDF4),
+    onPrimary = Color(0xFF0D314F),
+    primaryContainer = Color(0xFF244A6A),
+    onPrimaryContainer = BrandPrimaryContainer,
+    secondary = Color(0xFFBECFE2),
+    onSecondary = Color(0xFF293A4C),
+    secondaryContainer = Color(0xFF405266),
+    onSecondaryContainer = BrandSecondaryContainer,
+    tertiary = Color(0xFFE4CC92), onTertiary = Color(0xFF3D3011),
+    tertiaryContainer = Color(0xFF554723), onTertiaryContainer = BrandTertiaryContainer,
     background = BrandBackgroundDark,
-    surface = Color(0xFF1D1B20),
-    surfaceVariant = Color(0xFF49454F)
+    onBackground = Color(0xFFE3ECF5),
+    surface = BrandSurfaceDark, onSurface = Color(0xFFE3ECF5),
+    surfaceContainerLowest = Color(0xFF0A121A),
+    surfaceContainerLow = Color(0xFF1C2834), surfaceContainer = Color(0xFF22313F),
+    surfaceContainerHigh = Color(0xFF2A3B4B), surfaceContainerHighest = Color(0xFF344858),
+    surfaceVariant = Color(0xFF425667), onSurfaceVariant = Color(0xFFBBCADB),
+    outline = Color(0xFF8899AA), outlineVariant = Color(0xFF425667),
+    inverseSurface = Color(0xFFE3ECF5), inverseOnSurface = Color(0xFF2B3A49),
+    inversePrimary = BrandPrimary
 )
 
 /** 共享主题入口：风格与明暗模式独立；Material You 支持 Android 12+ 壁纸取色。 */
@@ -123,7 +159,7 @@ fun WenYouTheme(
         MaterialTheme(
             colorScheme = colorScheme,
             typography = if (style == ThemeStyle.APPLE) AppleTypography else AppTypography,
-            shapes = if (style == ThemeStyle.APPLE) AppleShapes else Shapes(large = RoundedCornerShape(20.dp)),
+            shapes = if (style == ThemeStyle.APPLE) AppleShapes else AppShapes,
             content = content
         )
     }

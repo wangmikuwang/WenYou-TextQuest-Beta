@@ -1,5 +1,8 @@
 package io.wenyou.textquest.ui.screens
 
+import io.wenyou.textquest.ui.common.AppTextButton
+import io.wenyou.textquest.ui.theme.readableAccent
+
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -59,7 +62,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -147,8 +149,8 @@ fun StoryListScreen(container: WenYouApp.AppContainer, nav: NavHostController) {
             CenterAlignedTopAppBar(
                 title = { Text("剧情库") },
                 actions = {
-                    TextButton(onClick = { creationOpen = true }) { Text("AI 创建") }
-                    TextButton(onClick = { importPicker = true }) { Text("导入") }
+                    AppTextButton(onClick = { creationOpen = true }) { Text("AI 创建") }
+                    AppTextButton(onClick = { importPicker = true }) { Text("导入") }
                 }
             )
         },
@@ -213,13 +215,13 @@ fun StoryListScreen(container: WenYouApp.AppContainer, nav: NavHostController) {
             title = { Text("删除剧情？") },
             text = { Text("「${story.title}」及其所有存档都会被删除。") },
             confirmButton = {
-                TextButton(onClick = {
+                AppTextButton(onClick = {
                     vm.deleteStory(story.id)
                     pendingDelete = null
                 }) { Text("删除", color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
-                TextButton(onClick = { pendingDelete = null }) { Text("取消") }
+                AppTextButton(onClick = { pendingDelete = null }) { Text("取消") }
             }
         )
     }
@@ -297,9 +299,9 @@ fun SharePickDialog(title: String, onCode: () -> Unit, onQr: () -> Unit, onDismi
         text = { Text("选择分享方式：给对方「分享码」文本，或生成「二维码」让对方直接扫码。") },
         confirmButton = {
             Row {
-                TextButton(onClick = onCode) { Text("分享码") }
-                TextButton(onClick = onQr) { Text("二维码") }
-                TextButton(onClick = onDismiss) { Text("取消") }
+                AppTextButton(onClick = onCode) { Text("分享码") }
+                AppTextButton(onClick = onQr) { Text("二维码") }
+                AppTextButton(onClick = onDismiss) { Text("取消") }
             }
         }
     )
@@ -313,7 +315,7 @@ fun ShareTextDialog(title: String, code: String, onDismiss: () -> Unit) {
             onDismissRequest = onDismiss,
             title = { Text("无法生成分享码") },
             text = { Text("内容不存在或超过 8 MiB，请使用设置中的整包导出。") },
-            confirmButton = { TextButton(onClick = onDismiss) { Text("关闭") } }
+            confirmButton = { AppTextButton(onClick = onDismiss) { Text("关闭") } }
         )
         return
     }
@@ -349,11 +351,11 @@ fun ShareTextDialog(title: String, code: String, onDismiss: () -> Unit) {
         },
         confirmButton = {
             Row {
-                TextButton(onClick = {
+                AppTextButton(onClick = {
                     clipboard.setText(AnnotatedString(code))
                     copied = true
                 }) { Text("复制") }
-                TextButton(onClick = {
+                AppTextButton(onClick = {
                     val send = Intent(Intent.ACTION_SEND).apply {
                         type = "text/plain"
                         putExtra(Intent.EXTRA_SUBJECT, title)
@@ -361,7 +363,7 @@ fun ShareTextDialog(title: String, code: String, onDismiss: () -> Unit) {
                     }
                     context.startActivity(Intent.createChooser(send, "分享「$title」"))
                 }) { Text("分享") }
-                TextButton(onClick = onDismiss) { Text("关闭") }
+                AppTextButton(onClick = onDismiss) { Text("关闭") }
             }
         }
     )
@@ -396,7 +398,7 @@ private fun ConnectingIndicator(label: String, modifier: Modifier = Modifier) {
     Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.size(9.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary.copy(alpha = alpha)))
         Spacer(Modifier.width(8.dp))
-        Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+        Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.readableAccent())
     }
 }
 
@@ -446,7 +448,7 @@ fun ShareQrDialog(title: String, code: String, onDismiss: () -> Unit) {
                     }
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                         IconButton(onClick = { idx = (idx - 1 + chunks.size) % chunks.size }) {
-                            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "上一张", tint = MaterialTheme.colorScheme.primary)
+                            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "上一张", tint = MaterialTheme.colorScheme.readableAccent())
                         }
                         Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                             val qr = remember(chunks[idx]) { QrCode.encode(chunks[idx], 620) }
@@ -458,7 +460,7 @@ fun ShareQrDialog(title: String, code: String, onDismiss: () -> Unit) {
                             if (qr != null) QrCard(qr, 260, Modifier.align(Alignment.CenterHorizontally).padding(top = 6.dp))
                         }
                         IconButton(onClick = { idx = (idx + 1) % chunks.size }) {
-                            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, "下一张", tint = MaterialTheme.colorScheme.primary)
+                            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, "下一张", tint = MaterialTheme.colorScheme.readableAccent())
                         }
                     }
                 } else {
@@ -480,12 +482,12 @@ fun ShareQrDialog(title: String, code: String, onDismiss: () -> Unit) {
         },
         confirmButton = {
             Row {
-                TextButton(onClick = {
+                AppTextButton(onClick = {
                     clipboard.setText(AnnotatedString(code))
                     copied = true
                 }) { Text("复制") }
                 if (isMulti) {
-                    TextButton(onClick = {
+                    AppTextButton(onClick = {
                         // 多片码无法存成单图，逐张编码保存到相册，便于离线获取整套码
                         var saved = 0
                         chunks.forEachIndexed { i, ch ->
@@ -501,14 +503,14 @@ fun ShareQrDialog(title: String, code: String, onDismiss: () -> Unit) {
                             android.widget.Toast.LENGTH_SHORT).show()
                     }) { Text("逐张保存") }
                 } else if (single != null) {
-                    TextButton(onClick = {
+                    AppTextButton(onClick = {
                         val loc = QrCode.saveToGallery(context, single, title)
                         android.widget.Toast.makeText(context,
                             if (loc != null) "已保存到 $loc" else "保存失败",
                             android.widget.Toast.LENGTH_SHORT).show()
                     }) { Text("保存") }
                 }
-                TextButton(onClick = onDismiss) { Text("关闭") }
+                AppTextButton(onClick = onDismiss) { Text("关闭") }
             }
         }
     )
@@ -523,10 +525,10 @@ fun ImportPickDialog(onText: () -> Unit, onScan: () -> Unit, onAlbum: () -> Unit
         text = { Text("选择导入方式：粘贴分享码、相机扫码，或从相册选择一张/整套二维码图片。") },
         confirmButton = {
             Row {
-                TextButton(onClick = onText) { Text("粘贴分享码") }
-                TextButton(onClick = onScan) { Text("相机扫码") }
-                TextButton(onClick = onAlbum) { Text("相册多选") }
-                TextButton(onClick = onDismiss) { Text("取消") }
+                AppTextButton(onClick = onText) { Text("粘贴分享码") }
+                AppTextButton(onClick = onScan) { Text("相机扫码") }
+                AppTextButton(onClick = onAlbum) { Text("相册多选") }
+                AppTextButton(onClick = onDismiss) { Text("取消") }
             }
         }
     )
@@ -566,10 +568,10 @@ fun ImportTextDialog(onDismiss: () -> Unit, onImport: (String, (String) -> Unit)
         },
         confirmButton = {
             Row {
-                TextButton(onClick = {
+                AppTextButton(onClick = {
                     if (text.isNotBlank()) onImport(text) { result = it }
                 }) { Text("导入") }
-                TextButton(onClick = onDismiss) { Text("关闭") }
+                AppTextButton(onClick = onDismiss) { Text("关闭") }
             }
         }
     )
@@ -612,7 +614,7 @@ private fun FilterEmptyState(title: String, body: String, showReset: Boolean, on
             textAlign = TextAlign.Center)
         Spacer(Modifier.height(6.dp))
         if (showReset) {
-            TextButton(onClick = onReset) { Text("清除筛选") }
+            AppTextButton(onClick = onReset) { Text("清除筛选") }
         }
     }
 }
@@ -652,7 +654,7 @@ private fun SavesDialog(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("关闭") } }
+        confirmButton = { AppTextButton(onClick = onDismiss) { Text("关闭") } }
     )
 }
 
