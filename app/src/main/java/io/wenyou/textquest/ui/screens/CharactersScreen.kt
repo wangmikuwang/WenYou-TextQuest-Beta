@@ -267,22 +267,22 @@ private fun CharacterCard(
                             overflow = TextOverflow.Ellipsis)
                 }
                 Spacer(Modifier.width(8.dp))
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    IconButton(onClick = onShare) {
-                        Icon(Icons.Filled.Share, "分享", tint = MaterialTheme.colorScheme.readableAccent())
-                    }
-                    IconButton(onClick = onEdit) { Icon(Icons.Filled.Edit, "编辑") }
-                    IconButton(onClick = onDelete) { Icon(Icons.Filled.Delete, "删除", tint = MaterialTheme.colorScheme.outline) }
-                }
             }
             Spacer(Modifier.height(10.dp))
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                if (c.adult) Pill("18+", container = MaterialTheme.colorScheme.primaryContainer)
+                if (c.adult) Pill("18+", container = MaterialTheme.colorScheme.primaryContainer, accentIndex = 2)
             }
             Spacer(Modifier.height(10.dp))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                IconButton(onClick = onShare) {
+                    Icon(Icons.Filled.Share, "分享", tint = MaterialTheme.colorScheme.readableAccent())
+                }
+                IconButton(onClick = onEdit) { Icon(Icons.Filled.Edit, "编辑") }
+                IconButton(onClick = onDelete) { Icon(Icons.Filled.Delete, "删除", tint = MaterialTheme.colorScheme.outline) }
+            }
             Text("参演剧情 · ${stories.size}", style = MaterialTheme.typography.labelLarge)
             if (stories.isEmpty()) {
                 Text("暂无", style = MaterialTheme.typography.bodySmall,

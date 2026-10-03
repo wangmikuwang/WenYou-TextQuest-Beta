@@ -187,7 +187,7 @@ fun SettingsScreen(container: WenYouApp.AppContainer, nav: NavHostController, up
             }
             if (ui.style == ThemeStyle.MATERIAL) item {
                 TonalCard {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         Column(Modifier.weight(1f)) {
                             Text("动态取色（壁纸配色）", style = MaterialTheme.typography.labelLarge)
                             Text(
@@ -223,7 +223,7 @@ fun SettingsScreen(container: WenYouApp.AppContainer, nav: NavHostController, up
             item { SectionHeader("成人内容") }
             item {
                 TonalCard {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         Column(Modifier.weight(1f)) {
                             Text("显示成人（18+）内容", style = MaterialTheme.typography.labelLarge)
                             Text("开启后显示成人预设，允许成年、自愿的亲密描写；关闭后保持非露骨。",
