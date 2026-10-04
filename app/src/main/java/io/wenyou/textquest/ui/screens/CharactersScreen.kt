@@ -39,10 +39,10 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import io.wenyou.textquest.ui.common.FilterTag
-import androidx.compose.material3.Icon
+import io.wenyou.textquest.ui.common.AppIcon as Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import io.wenyou.textquest.ui.common.AppText as Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -231,9 +231,9 @@ private fun CharacterEmptyState(title: String, body: String) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(title, style = MaterialTheme.typography.titleLarge)
+        io.wenyou.textquest.ui.common.RawText(title, style = MaterialTheme.typography.titleLarge)
         Spacer(Modifier.height(8.dp))
-        Text(body, style = MaterialTheme.typography.bodyMedium,
+        io.wenyou.textquest.ui.common.RawText(body, style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center)
         Spacer(Modifier.height(6.dp))
@@ -260,10 +260,10 @@ private fun CharacterCard(
                 EmojiBadge(c.emoji, avatarColor(c.colorIndex), size = 54.dp)
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f).padding(top = 2.dp)) {
-                    Text(c.name, style = MaterialTheme.typography.titleLarge, maxLines = 2,
+                    io.wenyou.textquest.ui.common.RawText(c.name, style = MaterialTheme.typography.titleLarge, maxLines = 2,
                         overflow = TextOverflow.Ellipsis)
                     if (c.tagline.isNotBlank())
-                        Text(c.tagline, style = MaterialTheme.typography.bodySmall,
+                        io.wenyou.textquest.ui.common.RawText(c.tagline, style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1,
                             overflow = TextOverflow.Ellipsis)
                     if (c.personality.isNotBlank())
@@ -300,7 +300,7 @@ private fun CharacterCard(
                     stories.forEach { story ->
                         AssistChip(
                             onClick = { onPlay(story) },
-                            label = { Text(story.title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                            label = { io.wenyou.textquest.ui.common.RawText(story.title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                             leadingIcon = { Icon(Icons.Filled.PlayArrow, "开始剧情") }
                         )
                     }

@@ -10,8 +10,6 @@ import androidx.compose.material3.Shapes
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ColorScheme
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -26,7 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
 enum class ThemeStyle {
-    MATERIAL, APPLE;
+    MATERIAL, APPLE, MIUIX;
     companion object {
         fun fromStored(raw: String?): ThemeStyle = entries.firstOrNull { it.name == raw } ?: MATERIAL
     }
@@ -55,15 +53,6 @@ internal fun appleColors(dark: Boolean) = if (dark) darkColorScheme(
     surfaceVariant = Color(0xFFECECF1), onSurfaceVariant = Color(0xFF56565E), outline = Color(0xFF767680), outlineVariant = Color(0xFFD1D1D6), surfaceTint = Color.Transparent
 )
 val LocalThemeStyle = staticCompositionLocalOf { ThemeStyle.MATERIAL }
-
-internal fun ColorScheme.readableAccent(accent: Color = primary): Color {
-    val foreground = accent.luminance()
-    return if (listOf(background, surface, surfaceContainerLowest, surfaceContainerLow,
-        surfaceContainer, surfaceContainerHigh, surfaceContainerHighest).all {
-        val background = it.luminance()
-        (maxOf(foreground, background) + 0.05f) / (minOf(foreground, background) + 0.05f) >= 4.5f
-    }) accent else onSurface
-}
 private val AppleShapes = Shapes(extraSmall = RoundedCornerShape(6.dp), small = RoundedCornerShape(10.dp), medium = RoundedCornerShape(14.dp), large = RoundedCornerShape(22.dp), extraLarge = RoundedCornerShape(30.dp))
 private val AppShapes = Shapes(
     extraSmall = RoundedCornerShape(4.dp), small = RoundedCornerShape(8.dp),
@@ -129,6 +118,7 @@ fun WenYouTheme(
     mode: ThemeMode = ThemeMode.SYSTEM,
     dynamicColor: Boolean = true,
     style: ThemeStyle = ThemeStyle.MATERIAL,
+    appearance: AppearancePrefs = AppearancePrefs(glassEnabled = style == ThemeStyle.APPLE),
     content: @Composable () -> Unit
 ) {
     val dark = when (mode) {
@@ -148,18 +138,33 @@ fun WenYouTheme(
             }
         }
     }
-    val colorScheme = when {
+    val baseColors = androidx.compose.runtime.remember(style, dark, dynamicColor, appearance.colorSource, appearance.seed, appearance.paletteStyle, appearance.colorSpec, context) {
+    val original = when {
+        appearance.colorSource == "custom" -> customColors(if (dark) DarkColors else LightColors, appearance, dark)
         style == ThemeStyle.APPLE -> appleColors(dark)
+        style == ThemeStyle.MIUIX -> appleColors(dark).copy(primary = if (dark) Color(0xFF89B6FF) else Color(0xFF3482FF))
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
             if (dark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         dark -> DarkColors
         else -> LightColors
     }
-    CompositionLocalProvider(LocalThemeStyle provides style) {
+    original
+    }
+    val amoledBase = if (dark && appearance.amoled) baseColors.copy(background = Color.Black, surface = Color.Black, surfaceContainerLowest = Color.Black) else baseColors
+    val configured = overrideColors(amoledBase, appearance, dark)
+    val colorScheme = configured
+    val systemDensity = androidx.compose.ui.platform.LocalDensity.current
+    val densityScale = appearance.uiScale * (if (appearance.displayScale == 0) 1f else appearance.displayScale / 100f)
+    val typography = androidx.compose.runtime.remember(style, appearance.fontFile, appearance.fontWeight, context) {
+        appearanceTypography(if (style == ThemeStyle.APPLE) AppleTypography else AppTypography, appearance, context)
+    }
+    CompositionLocalProvider(LocalThemeStyle provides style, LocalAppearance provides appearance, LocalGlassEnabled provides appearance.glassEnabled,
+        androidx.compose.ui.platform.LocalDensity provides androidx.compose.ui.unit.Density(systemDensity.density * densityScale, systemDensity.fontScale * appearance.fontScale),
+        LocalAccentPalette provides emptyList()) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = if (style == ThemeStyle.APPLE) AppleTypography else AppTypography,
-            shapes = if (style == ThemeStyle.APPLE) AppleShapes else AppShapes,
+            typography = typography,
+            shapes = if (style == ThemeStyle.APPLE || style == ThemeStyle.MIUIX) AppleShapes else AppShapes,
             content = content
         )
     }

@@ -4,6 +4,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import io.wenyou.textquest.ui.theme.ThemeMode
 import io.wenyou.textquest.ui.theme.ThemeStyle
+import io.wenyou.textquest.ui.theme.AppearancePrefs
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +19,8 @@ data class UiPrefs(
     val defaultProviderId: String? = null,
     val adultContent: Boolean = true,
     val generationNotifications: Boolean = false,
-    val themeStyle: ThemeStyle = ThemeStyle.MATERIAL
+    val themeStyle: ThemeStyle = ThemeStyle.MATERIAL,
+    val appearance: AppearancePrefs = AppearancePrefs()
 )
 
 /** 轻量应用设置（SharedPreferences），变更同步发布到 [state] 供主题实时响应。 */
@@ -28,6 +33,7 @@ class SettingsStore(context: Context) {
     val state: StateFlow<UiPrefs> = _state.asStateFlow()
 
     private fun load(): UiPrefs = UiPrefs(
+        appearance = runCatching { prefs.getString("appearance_v1", null)?.let { appearanceJson.decodeFromString<AppearancePrefs>(it).normalized() } ?: AppearancePrefs(glassEnabled = ThemeStyle.fromStored(prefs.getString(KEY_STYLE, null)) == ThemeStyle.APPLE) }.getOrDefault(AppearancePrefs()),
         generationNotifications = prefs.getBoolean("generation_notifications", false),
         themeStyle = ThemeStyle.fromStored(prefs.getString(KEY_STYLE, null)),
         themeMode = themeOf(prefs.getString(KEY_THEME, ThemeMode.SYSTEM.name)),
@@ -48,9 +54,17 @@ class SettingsStore(context: Context) {
         _state.value = _state.value.copy(generationNotifications = on)
     }
 
+    @Synchronized
+    fun updateAppearance(change: (AppearancePrefs) -> AppearancePrefs) {
+        val next = change(_state.value.appearance).normalized()
+        prefs.edit().putString("appearance_v1", appearanceJson.encodeToString(next)).apply()
+        _state.value = _state.value.copy(appearance = next)
+    }
+
     fun setThemeStyle(style: ThemeStyle) {
         prefs.edit().putString(KEY_STYLE, style.name).apply()
         _state.value = _state.value.copy(themeStyle = style)
+        updateAppearance { it.copy(glassEnabled = style == ThemeStyle.APPLE) }
     }
 
     fun setThemeMode(mode: ThemeMode) {
@@ -106,6 +120,7 @@ class SettingsStore(context: Context) {
         set(value) = prefs.edit().putBoolean(KEY_COMPACT, value).apply()
 
     private companion object {
+        val appearanceJson = Json { ignoreUnknownKeys = true; encodeDefaults = true }
         const val KEY_STYLE = "theme_style"
         const val KEY_THEME = "theme_mode"
         const val KEY_DYNAMIC = "dynamic_color"
