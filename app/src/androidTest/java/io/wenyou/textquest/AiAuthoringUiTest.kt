@@ -40,7 +40,7 @@ class AiAuthoringUiTest {
         for (attempt in 0..2) {
             try {
                 val bitmap = compose.onRoot().captureToImage().asAndroidBitmap()
-                File(compose.activity.cacheDir, name).outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+                File(compose.activity.cacheDir, "ui-${BuildConfig.VERSION_CODE}-$name").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
                 return
             } catch (failure: ComposeTimeoutException) {
                 if (attempt == 2) throw failure
@@ -317,7 +317,8 @@ class AiAuthoringUiTest {
                 }
                 compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("默认服务"))
                 compose.onNodeWithText("默认服务").assertIsDisplayed()
-                compose.onNodeWithText("系统通知设置").assertExists()
+                compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("系统通知设置"))
+                compose.onNodeWithText("系统通知设置").assertIsDisplayed()
                 screenshot("settings-${style.name.lowercase()}-preview.png")
             }
         } finally { ok.dispatcher.executorService.shutdownNow(); ok.connectionPool.evictAll() }
