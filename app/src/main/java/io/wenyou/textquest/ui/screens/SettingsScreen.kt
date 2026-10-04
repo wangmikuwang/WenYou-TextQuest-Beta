@@ -27,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import io.wenyou.textquest.ui.common.AppIcon as Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import io.wenyou.textquest.ui.common.AppText as Text
 import androidx.compose.ui.res.stringResource
@@ -67,7 +68,8 @@ import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun SettingsScreen(container: WenYouApp.AppContainer, nav: NavHostController, updateVm: AppUpdateViewModel = viewModel()) {
+fun SettingsScreen(container: WenYouApp.AppContainer, nav: NavHostController, updateVm: AppUpdateViewModel = viewModel(), category: String? = null) {
+    if (category == null) { SettingsMenuScreen(nav); return }
     val vm: SettingsViewModel = viewModel(factory = Vms.factory { SettingsViewModel(container) })
     val ui by vm.ui.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -120,25 +122,24 @@ fun SettingsScreen(container: WenYouApp.AppContainer, nav: NavHostController, up
         vm.setMessage("崩溃日志目录已设为「Documents」")
     }
 
-    HubScaffold(
+    Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("设置") },
+                title = { Text(settingsSections.firstOrNull { it.id == category }?.title ?: "设置") },
                 navigationIcon = {
                     IconButton(onClick = { nav.navigateUp() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "返回")
                     }
                 }
             )
-        },
-        nav = nav
+        }
     ) { padding ->
         LazyColumn(
             modifier = Modifier.padding(padding),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item {
+            if (category == "system") item {
                 Column(Modifier.fillMaxWidth().padding(bottom = 4.dp)) {
                     EasterEggTitle(stringResource(io.wenyou.textquest.R.string.app_name), MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
                         tapMessage = "🎬 幕后导演\n导演悄悄递来一张纸条：最精彩的剧情，往往从你不按套路的选择开始。\n今天，主角的名字叫你。",
@@ -148,7 +149,7 @@ fun SettingsScreen(container: WenYouApp.AppContainer, nav: NavHostController, up
                 }
             }
 
-            item {
+            if (category == "system") item {
                 AppUpdateCard(updateState, { updateVm.check() }, updateVm::download,
                     onOpenDownloads = { openUpdatePage(Intent(DownloadManager.ACTION_VIEW_DOWNLOADS)) },
                     onOpenRelease = { openUpdatePage(Intent(Intent.ACTION_VIEW,
@@ -163,110 +164,118 @@ fun SettingsScreen(container: WenYouApp.AppContainer, nav: NavHostController, up
                 }
             }
 
-            item {
-                TonalCard(Modifier.clickable { nav.navigate(R.APPEARANCE) }) {
-                    Text("外观与主题", style = MaterialTheme.typography.titleMedium)
-                    Text("界面风格、颜色、字体、大小与图标", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (category == "ai") {
+                item { SectionHeader("AI 与生成") }
+                item {
+                    TonalCard {
+                        AppDropdown(
+                            label = "默认服务",
+                            options = listOf("（使用第一个可用）" to "") +
+                                ui.providers.map { it.name to it.id },
+                            selected = ui.defaultProviderId ?: "",
+                            onSelect = { id -> vm.setDefaultProvider(id.ifBlank { null }) }
+                        )
+                    }
                 }
+
+                item { io.wenyou.textquest.ui.common.GenerationNotificationSettings(container.settings) }
+
             }
 
-            item { SectionHeader("AI 与生成") }
-            item {
-                TonalCard {
-                    AppDropdown(
-                        label = "默认服务",
-                        options = listOf("（使用第一个可用）" to "") +
-                            ui.providers.map { it.name to it.id },
-                        selected = ui.defaultProviderId ?: "",
-                        onSelect = { id -> vm.setDefaultProvider(id.ifBlank { null }) }
-                    )
-                }
-            }
-
-            item { io.wenyou.textquest.ui.common.GenerationNotificationSettings(container.settings) }
-
-            item { SectionHeader("成人内容") }
-            item {
-                TonalCard {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Column(Modifier.weight(1f)) {
-                            Text("显示成人（18+）内容", style = MaterialTheme.typography.labelLarge)
-                            Text("开启后显示成人预设，允许成年、自愿的亲密描写；关闭后保持非露骨。",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (category == "content") {
+                item { SectionHeader("成人内容") }
+                item {
+                    TonalCard {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Column(Modifier.weight(1f)) {
+                                Text("显示成人（18+）内容", style = MaterialTheme.typography.labelLarge)
+                                Text("开启后显示成人预设，允许成年、自愿的亲密描写；关闭后保持非露骨。",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            Switch(checked = ui.adultContent, onCheckedChange = { vm.setAdultContent(it) })
                         }
-                        Switch(checked = ui.adultContent, onCheckedChange = { vm.setAdultContent(it) })
-                    }
-                }
-            }
-            item { SectionHeader("数据备份") }
-            item {
-                TonalCard {
-                    Text("整体备份剧情、人物、AI 服务与存档，供恢复或迁移。",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Spacer(Modifier.height(10.dp))
-                    FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Button(onClick = {
-                            exportLauncher.launch("${BuildConfig.APP_FILE_PREFIX}-backup-${System.currentTimeMillis()}.json")
-                        }) { Text("导出备份") }
-                        AppOutlinedButton(onClick = {
-                            importLauncher.launch(arrayOf("application/json", "text/plain", "*/*"))
-                        }) { Text("导入备份") }
                     }
                 }
             }
 
-            item { SectionHeader("角色规则") }
-            item {
-                TonalCard {
-                    Text("底层基调", style = MaterialTheme.typography.labelLarge)
-                    Spacer(Modifier.height(6.dp))
-                    Text("角色优先遵守这些规则。在人物编辑中选择要应用的规则。",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Spacer(Modifier.height(10.dp))
-                    FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Button(onClick = { nav.navigate(R.bottomRuleEdit("new")) }) { Text("新建底层基调") }
-                        AppOutlinedButton(onClick = { nav.navigate(R.BOTTOM_RULES) }) { Text("管理底层基调") }
+            if (category == "backup") {
+                item { SectionHeader("数据备份") }
+                item {
+                    TonalCard {
+                        Text("整体备份剧情、人物、AI 服务与存档，供恢复或迁移。",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Spacer(Modifier.height(10.dp))
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Button(onClick = {
+                                exportLauncher.launch("${BuildConfig.APP_FILE_PREFIX}-backup-${System.currentTimeMillis()}.json")
+                            }) { Text("导出备份") }
+                            AppOutlinedButton(onClick = {
+                                importLauncher.launch(arrayOf("application/json", "text/plain", "*/*"))
+                            }) { Text("导入备份") }
+                        }
+                    }
+                }
+
+            }
+
+            if (category == "rules") {
+                item { SectionHeader("角色规则") }
+                item {
+                    TonalCard {
+                        Text("底层基调", style = MaterialTheme.typography.labelLarge)
+                        Spacer(Modifier.height(6.dp))
+                        Text("角色优先遵守这些规则。在人物编辑中选择要应用的规则。",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Spacer(Modifier.height(10.dp))
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Button(onClick = { nav.navigate(R.bottomRuleEdit("new")) }) { Text("新建底层基调") }
+                            AppOutlinedButton(onClick = { nav.navigate(R.BOTTOM_RULES) }) { Text("管理底层基调") }
+                        }
+                    }
+                }
+
+            }
+
+            if (category == "system") {
+                item { SectionHeader("诊断与关于") }
+                item {
+                    TonalCard {
+                        Text("崩溃日志保存位置", style = MaterialTheme.typography.labelLarge)
+                        Spacer(Modifier.height(6.dp))
+                        val dir = vm.crashDir()
+                        io.wenyou.textquest.ui.common.RawText(if (dir != null) "已设置：$dir" else "默认保存在应用内。可选择系统文档目录。",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Spacer(Modifier.height(10.dp))
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            AppOutlinedButton(onClick = { crashDirPicker.launch(null) }) { Text("选择系统文档目录") }
+                            Button(onClick = {
+                                val t = "测试日志 time=${System.currentTimeMillis()}\nversion=${BuildConfig.VERSION_NAME}\n"
+                                CrashLog.write(context, t, vm.crashDir())
+                                vm.setMessage("已写入测试日志（请到所选 Documents 目录查看 crash.log）")
+                            }) { Text("写入测试日志") }
+                        }
+                        Spacer(Modifier.height(6.dp))
+                        Text("日志文件：crash.log",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.outline)
+                    }
+                }
+
+                item {
+                    TonalCard {
+                        Text("版本", style = MaterialTheme.typography.labelLarge)
+                        Spacer(Modifier.height(6.dp))
+                        Text("v${BuildConfig.VERSION_NAME.substringBefore('-')}（build ${BuildConfig.VERSION_CODE}）\nAI 密钥保存在本机。",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
 
-            item { SectionHeader("诊断与关于") }
-            item {
-                TonalCard {
-                    Text("崩溃日志保存位置", style = MaterialTheme.typography.labelLarge)
-                    Spacer(Modifier.height(6.dp))
-                    val dir = vm.crashDir()
-                    io.wenyou.textquest.ui.common.RawText(if (dir != null) "已设置：$dir" else "默认保存在应用内。可选择系统文档目录。",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Spacer(Modifier.height(10.dp))
-                    FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        AppOutlinedButton(onClick = { crashDirPicker.launch(null) }) { Text("选择系统文档目录") }
-                        Button(onClick = {
-                            val t = "测试日志 time=${System.currentTimeMillis()}\nversion=${BuildConfig.VERSION_NAME}\n"
-                            CrashLog.write(context, t, vm.crashDir())
-                            vm.setMessage("已写入测试日志（请到所选 Documents 目录查看 crash.log）")
-                        }) { Text("写入测试日志") }
-                    }
-                    Spacer(Modifier.height(6.dp))
-                    Text("日志文件：crash.log",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.outline)
-                }
-            }
-
-            item {
-                TonalCard {
-                    Text("版本", style = MaterialTheme.typography.labelLarge)
-                    Spacer(Modifier.height(6.dp))
-                    Text("v${BuildConfig.VERSION_NAME.substringBefore('-')}（build ${BuildConfig.VERSION_CODE}）\nAI 密钥保存在本机。",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
             item { Spacer(Modifier.height(80.dp)) }
         }
     }
