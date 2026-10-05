@@ -51,7 +51,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import io.wenyou.textquest.data.ai.CreationKind
 import io.wenyou.textquest.WenYouApp
 import io.wenyou.textquest.data.model.CharacterData
 import io.wenyou.textquest.data.model.Story
@@ -79,7 +78,6 @@ fun CharactersScreen(container: WenYouApp.AppContainer, nav: NavHostController) 
     var sharePicker by remember { mutableStateOf<CharacterData?>(null) }
     var shareCodeChar by remember { mutableStateOf<CharacterData?>(null) }
     var shareQrChar by remember { mutableStateOf<CharacterData?>(null) }
-    var creationOpen by remember { mutableStateOf(false) }
     var importPicker by remember { mutableStateOf(false) }
     var importText by remember { mutableStateOf(false) }
     var scanning by remember { mutableStateOf(false) }
@@ -100,14 +98,11 @@ fun CharactersScreen(container: WenYouApp.AppContainer, nav: NavHostController) 
         }
     }
 
-    if (creationOpen) CreationDialog(container, nav, { creationOpen = false }, initialKind = CreationKind.CHARACTERS)
-
     HubScaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("角色") },
                 actions = {
-                    AppTextButton(onClick = { creationOpen = true }) { Text("AI 创建") }
                     AppTextButton(onClick = { importPicker = true }) { Text("导入") }
                 }
             )
