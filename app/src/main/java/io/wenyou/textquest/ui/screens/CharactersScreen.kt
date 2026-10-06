@@ -1,4 +1,7 @@
 package io.wenyou.textquest.ui.screens
+import io.wenyou.textquest.ui.common.SearchField
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.testTag
 import io.wenyou.textquest.ui.common.AppIcons
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
@@ -75,6 +78,10 @@ fun CharactersScreen(container: WenYouApp.AppContainer, nav: NavHostController) 
     val stories by vm.stories.collectAsStateWithLifecycle()
     val totalCharacters by vm.totalCharacters.collectAsStateWithLifecycle()
     var pendingDelete by remember { mutableStateOf<CharacterData?>(null) }
+    var query by rememberSaveable { mutableStateOf("") }
+    val shown = remember(characters, query) {
+        characters.filter { c -> query.isBlank() || listOf(c.name, c.tagline, c.personality).any { it.contains(query.trim(), ignoreCase = true) } }
+    }
     var sharePicker by remember { mutableStateOf<CharacterData?>(null) }
     var shareCodeChar by remember { mutableStateOf<CharacterData?>(null) }
     var shareQrChar by remember { mutableStateOf<CharacterData?>(null) }
@@ -114,7 +121,12 @@ fun CharactersScreen(container: WenYouApp.AppContainer, nav: NavHostController) 
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                if (characters.isEmpty()) {
+                item { SearchField(query, { query = it }, "搜索角色名、身份或性格", Modifier.testTag("character-search")) }
+                if (characters.isNotEmpty() && shown.isEmpty()) {
+                    item {
+                        CharacterEmptyState(title = "没有找到「${query.trim()}」", body = "换个关键词试试，或清除搜索。")
+                    }
+                } else if (characters.isEmpty()) {
                     item {
                         CharacterEmptyState(
                             title = "还没有角色",
@@ -122,7 +134,7 @@ fun CharactersScreen(container: WenYouApp.AppContainer, nav: NavHostController) 
                         )
                     }
                 } else {
-                    items(characters, key = { it.id }) { c ->
+                    items(shown, key = { it.id }) { c ->
                         CharacterCard(c, stories.filter { c.id in it.characterIds },
                             onPlay = { nav.navigate(R.play(it.id)) },
                             onEdit = { nav.navigate(R.charEdit(c.id)) },

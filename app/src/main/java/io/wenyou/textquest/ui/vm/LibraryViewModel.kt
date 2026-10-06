@@ -1,5 +1,7 @@
 package io.wenyou.textquest.ui.vm
 
+import io.wenyou.textquest.data.model.autoSaveName
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.wenyou.textquest.WenYouApp
@@ -119,6 +121,10 @@ class LibraryViewModel(container: WenYouApp.AppContainer) : ViewModel() {
     fun setContentFilter(f: StoryContentFilter) = _filters.update { it.copy(contentFilter = f) }
 
     fun deleteSave(id: String) = launchLibraryWrite { library.deleteSave(id) }
+    /** A blank name returns the save to its automatic "<story> · N 步" name. */
+    fun renameSave(slot: SaveSlot, name: String, storyTitle: String) = launchLibraryWrite {
+        library.upsertSave(slot.copy(name = name.trim().ifBlank { autoSaveName(storyTitle, slot.state.history.size) }))
+    }
     fun deleteStory(id: String) = launchLibraryWrite { library.deleteStory(id) }
     fun deleteCharacter(id: String) = launchLibraryWrite { library.deleteCharacter(id) }
     fun deleteProvider(id: String) = launchLibraryWrite { library.deleteProvider(id) }
