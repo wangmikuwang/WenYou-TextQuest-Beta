@@ -26,6 +26,11 @@ class WenYouApp : Application() {
         val settings = SettingsStore(context)
         val chatClient = suppliedClient ?: ChatClient(usage = io.wenyou.textquest.data.llm.UsageTracker(File(context.filesDir, "usage.json")))
         val director = AiDirector(chatClient)
+
+        init {
+            // Every AI request built by this client carries the player's baseline.
+            chatClient.baseline = library::currentBaseline
+        }
         val shareInbox = io.wenyou.textquest.data.repo.ShareInbox(context)
     }
 
@@ -161,11 +166,6 @@ class WenYouApp : Application() {
                 val ss = if (markAdult) s.copy(adult = true) else s
                 container.library.upsertStory(ss)
             }
-        }
-        // 预设自带的底层基调一并并入（按 id 去重、只补不覆盖）
-        val ruleIds = container.library.bottomRules.value.mapTo(mutableSetOf()) { it.id }
-        for (r in bundle.bottomRules) {
-            if (ruleIds.add(r.id)) container.library.upsertBottomRule(r)
         }
     }
 
