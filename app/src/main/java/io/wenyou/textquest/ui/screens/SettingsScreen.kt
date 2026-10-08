@@ -9,7 +9,9 @@ import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -66,7 +68,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun SettingsScreen(container: WenYouApp.AppContainer, nav: NavHostController, updateVm: AppUpdateViewModel = viewModel(), category: String? = null) {
     if (category == null) { SettingsMenuScreen(nav); return }
@@ -94,6 +96,12 @@ fun SettingsScreen(container: WenYouApp.AppContainer, nav: NavHostController, up
             }
             vm.setMessage(if (ok) "已导出全部数据（剧情/角色/服务/存档）" else "导出失败")
         }
+    }
+
+    // Developer mode: a long-press on the version unlocks it once; its switches then live in this page.
+    val unlockDeveloper = {
+        val first = container.devMode.unlock()
+        android.widget.Toast.makeText(context, if (first) "已开启开发者模式" else "开发者模式已开启", android.widget.Toast.LENGTH_SHORT).show()
     }
 
     val importLauncher = rememberLauncherForActivityResult(
@@ -263,10 +271,12 @@ fun SettingsScreen(container: WenYouApp.AppContainer, nav: NavHostController, up
                         Text("版本", style = MaterialTheme.typography.labelLarge)
                         Spacer(Modifier.height(6.dp))
                         Text("v${BuildConfig.VERSION_NAME.substringBefore('-')}（build ${BuildConfig.VERSION_CODE}）\nAI 密钥保存在本机。",
+                            modifier = Modifier.testTag("app-version").combinedClickable(onClick = {}, onLongClickLabel = "开发者模式", onLongClick = unlockDeveloper),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
+                item { DeveloperCard(container) }
             }
 
             item { Spacer(Modifier.height(80.dp)) }
