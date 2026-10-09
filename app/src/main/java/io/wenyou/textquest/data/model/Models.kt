@@ -6,7 +6,6 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.KSerializer
 
 /** 全局 JSON 配置：容忍新增字段、未知字段，便于手工编辑与跨版本迁移。
@@ -335,8 +334,6 @@ data class AppBundle(
     val origin: String = ""
 )
 
-/** 把任意 JSON 安全解析为 [JsonElement] 的辅助（用于导入校验）。 */
-fun parseLenient(text: String): JsonElement = AppJson.parseToJsonElement(text)
 
 @Serializable
 data class AchievementRecord(

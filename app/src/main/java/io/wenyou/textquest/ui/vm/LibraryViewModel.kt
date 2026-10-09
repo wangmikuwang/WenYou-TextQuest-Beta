@@ -147,7 +147,6 @@ class LibraryViewModel(container: WenYouApp.AppContainer) : ViewModel() {
     }
 
     /** 从分享码导入：只补不覆盖，结果通过 onResult 回调（主线程执行）。 */
-    fun storyCount(): Int = library.stories.value.size
 
     companion object {
         fun formatWhen(ts: Long): String {

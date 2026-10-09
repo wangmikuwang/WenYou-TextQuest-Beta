@@ -57,7 +57,7 @@ AI 服务管理位于设置的二级页面；设置首页采用搜索和分类�
 
 ## 5.4.4 字体与玻璃参考
 
-默认字体离线加载未经改动的 LXGW WenKai Regular（OFL 1.1），保留导入和字重设置。参考 LiquidGlassKMP 的原生 chrome 与内容分离、内容从玻璃下方滚动及前景可读性原则；其 swift-ui 分支的 Android 是普通 Material 导航，并非 Android 玻璃库，不复制 SwiftUI 或宣称使用 iOS 原生材质。Android 保留独立 AGSL/RenderEffect 实现，减轻表面遮白、阴影和高光，在边缘增加细微反光；列表/对话的占位及长截图排除控件机制保持。
+默认字体离线加载由 LXGW WenKai Regular 精简的子集（OFL 1.1；按保留字体名条款更名为 Bundled Kai，生成方式见 third_party/lxgw-wenkai/subset.py），保留导入和字重设置。参考 LiquidGlassKMP 的原生 chrome 与内容分离、内容从玻璃下方滚动及前景可读性原则；其 swift-ui 分支的 Android 是普通 Material 导航，并非 Android 玻璃库，不复制 SwiftUI 或宣称使用 iOS 原生材质。Android 保留独立 AGSL/RenderEffect 实现，减轻表面遮白、阴影和高光，在边缘增加细微反光；列表/对话的占位及长截图排除控件机制保持。
 
 ## 5.4.5 字体加粗
 
