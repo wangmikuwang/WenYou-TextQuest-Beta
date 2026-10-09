@@ -53,7 +53,7 @@ android {
     flavorDimensions += "content"
     productFlavors {
         create("beta") {
-            buildConfigField("String", "UPDATE_REPOSITORY", "\"wangmikuwang/WenYou-TextQuest-Beta\"")
+            buildConfigField("String", "UPDATE_REPOSITORY", "\"wangmikuwang/XingXu-Android\"")
             dimension = "content"
             applicationIdSuffix = ".beta"
 

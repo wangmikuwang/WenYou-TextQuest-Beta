@@ -62,7 +62,8 @@ class WenYouApp : Application() {
         appScope.launch {
             applyPresetAssets(listOf(
                 "presets/wenyou-bare-presets.json",
-                "presets/wenyou-bare2-presets.json"
+                "presets/wenyou-bare2-presets.json",
+                "presets/wenyou-genres-presets.json"
             ))
             applyPresetAssets(listOf("presets/wenyou-adult-straight-presets.json"), markAdult = true)
             repairContentFlags()
