@@ -27,6 +27,8 @@ import io.wenyou.textquest.ui.common.AppUpdateHost
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -143,6 +145,7 @@ fun WenYouAppRoot(container: WenYouApp.AppContainer, updateVm: AppUpdateViewMode
             }
             val dockPosition = animateFloatAsState(dockIndex.toFloat(), AppMotion.selection(), label = "navigation-lens")
             CompositionLocalProvider(LocalDockPosition provides dockPosition, LocalAccentPalette provides emptyList()) {
+                ReadableWidth {
                 NavHost(navController = nav, startDestination = R.HOME,
                     enterTransition = {
                         if (initialState.destination.route in R.HUBS && targetState.destination.route in R.HUBS) fadeIn(AppMotion.fade())
@@ -203,6 +206,7 @@ fun WenYouAppRoot(container: WenYouApp.AppContainer, updateVm: AppUpdateViewMode
                         val saveId = entry.arguments?.getString(R.ARG_SAVE) ?: "new"
                         PlayScreen(container, nav, storyId = storyId, saveId = saveId)
                     }
+                }
                 }
             }
         }
@@ -285,3 +289,14 @@ fun HubScaffold(
 }
 
 private data class HubItem(val route: String, val label: String, val icon: androidx.compose.ui.graphics.vector.ImageVector)
+
+/** Widest content column; phones in portrait are narrower, tablets, foldables and landscape windows center it. */
+private val MAX_CONTENT_WIDTH = 840.dp
+
+/** Keeps every page a readable column on wide windows instead of stretching lines and controls edge to edge. */
+@Composable
+private fun ReadableWidth(content: @Composable () -> Unit) {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        Box(Modifier.fillMaxHeight().widthIn(max = MAX_CONTENT_WIDTH)) { content() }
+    }
+}
